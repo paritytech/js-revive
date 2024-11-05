@@ -16,7 +16,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "lint": "npx eslint 'src/**/*.{cjs,js,ts}' && npx prettier --check '**/*.{ts,json,yml}'",
+    "lint": "npx eslint 'src/**/*.{cjs,js,ts}' && npx prettier --check '**/*.{ts,json,yml,md}'",
     "test": "npm run build && node ./dist/index.test.js"
   },
   "devDependencies": {

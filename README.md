@@ -1,15 +1,16 @@
 # @parity/revive
 
-To install dependencies:
+Node.js module to compile Solidity contracts to Polkavm bytecode, using [Revive]
+(https://github.com/paritytech/revive)
 
-```bash
-bun install
+
+# Usage
+
+```typescript
+const sources = {
+["contracts/1_Storage.sol"]: {
+    content: readFileSync("fixtures/storage.sol", "utf8"),
+}
+
+const out = await compile(sources);
 ```
-
-To run:
-
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.1.33. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
