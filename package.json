@@ -1,6 +1,8 @@
 {
   "name": "@parity/revive",
-  "version": "0.0.1",
+  "license": "Apache-2.0",
+  "version": "0.0.0-updated-via-gh-releases",
+  "author": "Parity <admin@parity.io> (https://parity.io)",
   "module": "index.ts",
   "types": "./dist/index.d.ts",
   "main": "./dist/index.js",
