@@ -1,7 +1,6 @@
 # @parity/revive
 
-Node.js module to compile Solidity contracts to Polkavm bytecode, using [Revive]
-(https://github.com/paritytech/revive)
+Node.js module to compile Solidity contracts to Polkavm bytecode, using [Revive](https://github.com/paritytech/revive)
 
 # Usage
 
