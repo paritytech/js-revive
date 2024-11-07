@@ -41,7 +41,7 @@ type SolcOutput = {
 }
 
 export function resolveInputs(sources: SolcInput): SolcInput {
-    var input = {
+    const input = {
         language: 'Solidity',
         sources,
         settings: {
@@ -123,7 +123,7 @@ export function tryResolveImport(importPath: string) {
         return path.resolve(importPath)
     }
 
-    const importRegex = /^(@?[^@\/]+(?:\/[^@\/]+)?)(?:@([^\/]+))?(\/.+)$/
+    const importRegex = /^(@?[^@/]+(?:\/[^@/]+)?)(?:@([^/]+))?(\/.+)$/
     const match = importPath.match(importRegex)
 
     if (!match) {
@@ -139,13 +139,16 @@ export function tryResolveImport(importPath: string) {
         packageJsonPath = require.resolve(
             path.join(basePackage, 'package.json')
         )
-    } catch (err) {
+    } catch {
         throw new Error(`Could not resolve package ${basePackage}`)
     }
 
     // Check if a version was specified and compare with the installed version
     if (specifiedVersion) {
-        const installedVersion = require(packageJsonPath).version
+        const installedVersion = JSON.parse(
+            readFileSync(packageJsonPath, 'utf-8')
+        ).version
+
         if (installedVersion !== specifiedVersion) {
             throw new Error(
                 `Version mismatch: Specified ${basePackage}@${specifiedVersion}, but installed version is ${installedVersion}`

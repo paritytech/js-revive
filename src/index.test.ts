@@ -80,7 +80,7 @@ test('resolve import', () => {
         },
     ]
 
-    for (let { file, expected } of cases) {
+    for (const { file, expected } of cases) {
         try {
             const resolved = tryResolveImport(file)
             assert(

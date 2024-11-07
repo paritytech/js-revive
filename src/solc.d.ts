@@ -78,6 +78,6 @@ declare module 'solc' {
     // Main exported functions
     export function compile(
         input: string | CompileInput,
-        options?: { import: (path: string) => any }
+        options?: { import: (path: string) => { contents: string } }
     ): string
 }
