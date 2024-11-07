@@ -1,70 +1,165 @@
+import solc from 'solc'
+import path from 'path'
+import { existsSync, readFileSync } from 'fs'
+
 type SolcInput = {
-  [contractName: string]: {
-    content: string;
-  };
-};
+    [contractName: string]: {
+        content: string
+    }
+}
 
 type SolcOutput = {
-  contracts: {
-    [contractName: string]: {
-      Storage: {
-        abi: Array<{
-          name: string;
-          inputs: Array<{ name: string; type: string }>;
-          outputs: Array<{ name: string; type: string }>;
-          stateMutability: string;
-          type: string;
-        }>;
-        evm: {
-          bytecode: { object: string };
-        };
-      };
-    };
-  };
-  errors?: Array<{
-    component: string;
-    errorCode: string;
-    formattedMessage: string;
-    message: string;
-    severity: string;
-    sourceLocation?: {
-      file: string;
-      start: number;
-      end: number;
-    };
-    type: string;
-  }>;
-};
+    contracts: {
+        [contractName: string]: {
+            Storage: {
+                abi: Array<{
+                    name: string
+                    inputs: Array<{ name: string; type: string }>
+                    outputs: Array<{ name: string; type: string }>
+                    stateMutability: string
+                    type: string
+                }>
+                evm: {
+                    bytecode: { object: string }
+                }
+            }
+        }
+    }
+    errors?: Array<{
+        component: string
+        errorCode: string
+        formattedMessage: string
+        message: string
+        severity: string
+        sourceLocation?: {
+            file: string
+            start: number
+            end: number
+        }
+        type: string
+    }>
+}
+
+export function resolveInputs(sources: SolcInput): SolcInput {
+    var input = {
+        language: 'Solidity',
+        sources,
+        settings: {
+            outputSelection: {
+                '*': {
+                    '*': ['evm.bytecode.object'],
+                },
+            },
+        },
+    }
+
+    const out = solc.compile(JSON.stringify(input), {
+        import: (path: string) => {
+            return {
+                contents: readFileSync(tryResolveImport(path), 'utf8'),
+            }
+        },
+    })
+
+    const output = JSON.parse(out) as {
+        sources: { [fileName: string]: { id: number } }
+    }
+
+    return Object.fromEntries(
+        Object.keys(output.sources).map((fileName) => {
+            return [
+                fileName,
+                sources[fileName] ?? {
+                    content: readFileSync(tryResolveImport(fileName), 'utf8'),
+                },
+            ]
+        })
+    )
+}
 
 export async function compile(sources: SolcInput): Promise<SolcOutput> {
-  const body = {
-    cmd: "--standard-json",
-    input: JSON.stringify({
-      language: "Solidity",
-      sources,
-      settings: {
-        optimizer: { enabled: false, runs: 200 },
-        outputSelection: {
-          "*": {
-            "*": ["abi"],
-          },
+    // compile with solc to resolve all the imports
+    sources = resolveInputs(sources)
+
+    const body = {
+        cmd: '--standard-json',
+        input: JSON.stringify({
+            language: 'Solidity',
+            sources,
+            settings: {
+                optimizer: { enabled: false, runs: 200 },
+                outputSelection: {
+                    '*': {
+                        '*': ['abi'],
+                    },
+                },
+            },
+        }),
+    }
+
+    const response = await fetch('https://remix-backend.polkadot.io/resolc', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
         },
-      },
-    }),
-  };
+        body: JSON.stringify(body),
+    })
 
-  const response = await fetch("https://remix-backend.polkadot.io/resolc", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
+    if (!response.ok) {
+        const text = await response.text().catch(() => '')
+        throw new Error(`${response.statusText}: ${text}`)
+    }
 
-  if (!response.ok) {
-    const text = await response.text().catch(() => "");
-    throw new Error(`${response.statusText}: ${text}`);
-  }
+    return (await response.json()) as SolcOutput
+}
 
-  return (await response.json()) as SolcOutput;
+/**
+ * Resolve an import path to a file path.
+ * @param importPath - The import path to resolve.
+ */
+export function tryResolveImport(importPath: string) {
+    // resolve local path
+    if (existsSync(importPath)) {
+        return path.resolve(importPath)
+    }
+
+    const importRegex = /^(@?[^@\/]+(?:\/[^@\/]+)?)(?:@([^\/]+))?(\/.+)$/
+    const match = importPath.match(importRegex)
+
+    if (!match) {
+        throw new Error('Invalid import path format.')
+    }
+
+    const basePackage = match[1] // "foo", "@scope/foo"
+    const specifiedVersion = match[2] // "1.2.3" (optional)
+    const relativePath = match[3] // "/path/to/file.sol"
+
+    let packageJsonPath
+    try {
+        packageJsonPath = require.resolve(
+            path.join(basePackage, 'package.json')
+        )
+    } catch (err) {
+        throw new Error(`Could not resolve package ${basePackage}`)
+    }
+
+    // Check if a version was specified and compare with the installed version
+    if (specifiedVersion) {
+        const installedVersion = require(packageJsonPath).version
+        if (installedVersion !== specifiedVersion) {
+            throw new Error(
+                `Version mismatch: Specified ${basePackage}@${specifiedVersion}, but installed version is ${installedVersion}`
+            )
+        }
+    }
+
+    const packageRoot = path.dirname(packageJsonPath)
+
+    // Construct full path to the requested file
+    const resolvedPath = path.join(packageRoot, relativePath)
+    if (existsSync(resolvedPath)) {
+        return resolvedPath
+    } else {
+        throw new Error(`Resolved path ${resolvedPath} does not exist.`)
+    }
 }
