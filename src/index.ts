@@ -8,10 +8,24 @@ type SolcInput = {
     }
 }
 
+type SolcError = {
+    component: string
+    errorCode: string
+    formattedMessage: string
+    message: string
+    severity: string
+    sourceLocation?: {
+        file: string
+        start: number
+        end: number
+    }
+    type: string
+}
+
 type SolcOutput = {
     contracts: {
-        [contractName: string]: {
-            Storage: {
+        [contractPath: string]: {
+            [contractName: string]: {
                 abi: Array<{
                     name: string
                     inputs: Array<{ name: string; type: string }>
@@ -25,19 +39,7 @@ type SolcOutput = {
             }
         }
     }
-    errors?: Array<{
-        component: string
-        errorCode: string
-        formattedMessage: string
-        message: string
-        severity: string
-        sourceLocation?: {
-            file: string
-            start: number
-            end: number
-        }
-        type: string
-    }>
+    errors?: Array<SolcError>
 }
 
 export function resolveInputs(sources: SolcInput): SolcInput {
@@ -63,6 +65,11 @@ export function resolveInputs(sources: SolcInput): SolcInput {
 
     const output = JSON.parse(out) as {
         sources: { [fileName: string]: { id: number } }
+        errors: Array<SolcError>
+    }
+
+    if (output.errors && Object.keys(output.sources).length === 0) {
+        throw new Error(output.errors[0].formattedMessage)
     }
 
     return Object.fromEntries(
