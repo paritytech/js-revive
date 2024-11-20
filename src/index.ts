@@ -1,6 +1,6 @@
 import solc from 'solc'
 import path from 'path'
-import Module from './resolc.mjs';
+import createRevive from './resolc.js';
 import { existsSync, readFileSync } from 'fs'
 
 type SolcInput = {
@@ -102,9 +102,9 @@ export async function compile(sources: SolcInput): Promise<SolcOutput> {
             },
         });
 
-    const revive = await Module();
+    const revive = await createRevive();
     revive.solc = solc;
-    revive.setStdinData(JSON.stringify(input));
+    revive.setStdinData(input);
 
     var stdout = "";
     revive.setStdoutCallback(function(char: String) {

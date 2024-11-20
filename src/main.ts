@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs'
-import { compile } from '.'
+import { compile } from './index.js'
 
 const contract = 'fixtures/token.sol'
 const sources = {

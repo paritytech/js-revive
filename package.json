@@ -18,11 +18,11 @@
         "dist"
     ],
     "scripts": {
-        "build": "tsc",
+        "build": "tsc && cp src/resolc.{wasm,js} dist/",
         "lint": "npx eslint 'src/**/*.{cjs,js,ts}' && npx prettier --check '**/*.{ts,json,yml,md}'",
         "lint:fix": "npx prettier --write '**/*.{ts,json,yml,md}'",
         "test": "npm run build && node ./dist/index.test.js",
-        "download:revive": "curl -L -o ./src/revive.wasm https://github.com/smiasojed/revive/releases/download/0.0.1/resolc.wasm && curl -L -o ./src/resolc.js https://github.com/smiasojed/revive/releases/download/0.0.1/resolc.js"
+        "download:revive": "curl -L -o ./src/resolc.wasm https://github.com/smiasojed/revive/releases/download/0.0.1/resolc.wasm && curl -L -o ./src/resolc.js https://github.com/smiasojed/revive/releases/download/0.0.1/resolc.js"
     },
     "devDependencies": {
         "@eslint/js": "^9.14.0",
@@ -34,6 +34,7 @@
     },
     "dependencies": {
         "@types/node": "^22.9.0",
+        "deasync": "^0.1.30",
         "package-json": "^10.0.1",
         "solc": "^0.8.28"
     }
