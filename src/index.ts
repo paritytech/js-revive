@@ -1,5 +1,6 @@
 import solc from 'solc'
 import path from 'path'
+import Module from './resolc.mjs';
 import { existsSync, readFileSync } from 'fs'
 
 type SolcInput = {
@@ -88,9 +89,7 @@ export async function compile(sources: SolcInput): Promise<SolcOutput> {
     // compile with solc to resolve all the imports
     sources = resolveInputs(sources)
 
-    const body = {
-        cmd: '--standard-json',
-        input: JSON.stringify({
+    const input = JSON.stringify({
             language: 'Solidity',
             sources,
             settings: {
@@ -101,23 +100,30 @@ export async function compile(sources: SolcInput): Promise<SolcOutput> {
                     },
                 },
             },
-        }),
+        });
+
+    const revive = await Module();
+    revive.solc = solc;
+    revive.setStdinData(JSON.stringify(input));
+
+    var stdout = "";
+    revive.setStdoutCallback(function(char: String) {
+        stdout += char;
+    });
+
+    var stderr = "";
+    revive.setStderrCallback(function(char: String) {
+        stderr += char;
+    });
+
+    // Compile the Solidity source code
+    let result = revive.callMain(['--standard-json']);
+
+    if (result) {
+        throw new Error(stderr)
     }
 
-    const response = await fetch('https://remix-backend.polkadot.io/resolc', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-    })
-
-    if (!response.ok) {
-        const text = await response.text().catch(() => '')
-        throw new Error(`${response.statusText}: ${text}`)
-    }
-
-    return (await response.json()) as SolcOutput
+    return JSON.parse(stdout) as SolcOutput
 }
 
 /**

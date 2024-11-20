@@ -6,6 +6,7 @@
     "module": "index.ts",
     "types": "./dist/index.d.ts",
     "main": "./dist/index.js",
+    "type": "module",
     "exports": {
         ".": {
             "import": "./dist/index.js",
@@ -20,7 +21,8 @@
         "build": "tsc",
         "lint": "npx eslint 'src/**/*.{cjs,js,ts}' && npx prettier --check '**/*.{ts,json,yml,md}'",
         "lint:fix": "npx prettier --write '**/*.{ts,json,yml,md}'",
-        "test": "npm run build && node ./dist/index.test.js"
+        "test": "npm run build && node ./dist/index.test.js",
+        "download:revive": "curl -L -o ./src/revive.wasm https://github.com/smiasojed/revive/releases/download/0.0.1/resolc.wasm && curl -L -o ./src/resolc.js https://github.com/smiasojed/revive/releases/download/0.0.1/resolc.js"
     },
     "devDependencies": {
         "@eslint/js": "^9.14.0",
