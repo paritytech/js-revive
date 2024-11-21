@@ -1,6 +1,6 @@
 import solc from 'solc'
 import path from 'path'
-import createRevive from "./resolc.js"
+import createRevive from './resolc.js'
 import { existsSync, readFileSync } from 'fs'
 
 type SolcInput = {
@@ -90,34 +90,34 @@ export async function compile(sources: SolcInput): Promise<SolcOutput> {
     sources = resolveInputs(sources)
 
     const input = JSON.stringify({
-            language: 'Solidity',
-            sources,
-            settings: {
-                optimizer: { enabled: false, runs: 200 },
-                outputSelection: {
-                    '*': {
-                        '*': ['abi'],
-                    },
+        language: 'Solidity',
+        sources,
+        settings: {
+            optimizer: { enabled: false, runs: 200 },
+            outputSelection: {
+                '*': {
+                    '*': ['abi'],
                 },
             },
-        });
+        },
+    })
 
-    const revive = await createRevive();
-    revive.solc = solc;
-    revive.setStdinData(input);
+    const revive = await createRevive()
+    revive.solc = solc
+    revive.setStdinData(input)
 
-    let stdout = "";
-    revive.setStdoutCallback(function(char: string) {
-        stdout += char;
-    });
+    let stdout = ''
+    revive.setStdoutCallback(function (char: string) {
+        stdout += char
+    })
 
-    let stderr = "";
-    revive.setStderrCallback(function(char: string) {
-        stderr += char;
-    });
+    let stderr = ''
+    revive.setStderrCallback(function (char: string) {
+        stderr += char
+    })
 
     // Compile the Solidity source code
-    const result = revive.callMain(['--standard-json']);
+    const result = revive.callMain(['--standard-json'])
 
     if (result) {
         throw new Error(stderr)

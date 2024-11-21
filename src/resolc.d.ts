@@ -1,2 +1,2 @@
-export = createRevive;
-declare function createRevive(...args): Promise;
+export = createRevive
+declare function createRevive(...args): Promise
