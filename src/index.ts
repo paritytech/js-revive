@@ -1,6 +1,6 @@
 import solc from 'solc'
 import path from 'path'
-import createRevive = require("./resolc.js")
+import createRevive from "./resolc.js"
 import { existsSync, readFileSync } from 'fs'
 
 type SolcInput = {
@@ -106,18 +106,18 @@ export async function compile(sources: SolcInput): Promise<SolcOutput> {
     revive.solc = solc;
     revive.setStdinData(input);
 
-    var stdout = "";
+    let stdout = "";
     revive.setStdoutCallback(function(char: string) {
         stdout += char;
     });
 
-    var stderr = "";
+    let stderr = "";
     revive.setStderrCallback(function(char: string) {
         stderr += char;
     });
 
     // Compile the Solidity source code
-    let result = revive.callMain(['--standard-json']);
+    const result = revive.callMain(['--standard-json']);
 
     if (result) {
         throw new Error(stderr)

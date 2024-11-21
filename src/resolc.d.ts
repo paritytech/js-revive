@@ -1,2 +1,2 @@
 export = createRevive;
-declare function createRevive(...args: any[]): Promise<any>;
+declare function createRevive(...args): Promise;
