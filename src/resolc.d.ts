@@ -1,2 +1,2 @@
-export default createRevive;
-declare function createRevive(moduleArg?: {}): Promise<any>;
+export = createRevive;
+declare function createRevive(...args: any[]): Promise<any>;

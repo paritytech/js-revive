@@ -1,7 +1,7 @@
 import { test } from 'node:test'
 import { readFileSync } from 'node:fs'
 import assert from 'node:assert'
-import { compile, tryResolveImport } from './index.js'
+import { compile, tryResolveImport } from '.'
 import { resolve } from 'node:path'
 
 test('check Ok output', async () => {

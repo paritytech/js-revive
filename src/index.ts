@@ -1,6 +1,6 @@
 import solc from 'solc'
 import path from 'path'
-import createRevive from './resolc.js';
+import createRevive = require("./resolc.js")
 import { existsSync, readFileSync } from 'fs'
 
 type SolcInput = {
@@ -107,12 +107,12 @@ export async function compile(sources: SolcInput): Promise<SolcOutput> {
     revive.setStdinData(input);
 
     var stdout = "";
-    revive.setStdoutCallback(function(char: String) {
+    revive.setStdoutCallback(function(char: string) {
         stdout += char;
     });
 
     var stderr = "";
-    revive.setStderrCallback(function(char: String) {
+    revive.setStderrCallback(function(char: string) {
         stderr += char;
     });
 
