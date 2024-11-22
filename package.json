@@ -18,7 +18,7 @@
         "dist"
     ],
     "scripts": {
-        "build": "tsc && cp src/resolc.{wasm,js} dist/ && cp src/worker.js dist/",
+        "build": "tsc && cp src/resolc.wasm dist/ && cp src/resolc.js dist/ && cp src/worker.js dist/",
         "lint": "npx eslint 'src/**/*.{cjs,js,ts}' && npx prettier --check '**/*.{ts,json,yml,md}'",
         "lint:fix": "npx prettier --write '**/*.{ts,json,yml,md}'",
         "test": "npm run build && node ./dist/index.test.js",
