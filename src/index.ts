@@ -1,4 +1,5 @@
 import solc from 'solc'
+import soljson from 'solc/soljson'
 import path from 'path'
 import createRevive from './resolc.js'
 import { existsSync, readFileSync } from 'fs'
@@ -103,7 +104,7 @@ export async function compile(sources: SolcInput): Promise<SolcOutput> {
     })
 
     const revive = await createRevive()
-    revive.solc = solc
+    revive.soljson = soljson
     revive.setStdinData(input)
 
     let stdout = ''

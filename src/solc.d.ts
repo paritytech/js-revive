@@ -81,3 +81,7 @@ declare module 'solc' {
         options?: { import: (path: string) => { contents: string } }
     ): string
 }
+declare module 'solc/soljson' {
+    const soljson: any
+    export default soljson
+}
