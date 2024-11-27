@@ -82,6 +82,6 @@ declare module 'solc' {
     ): string
 }
 declare module 'solc/soljson' {
-    const soljson: any
+    const soljson: object
     export default soljson
 }

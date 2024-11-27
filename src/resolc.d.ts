@@ -1,2 +1,2 @@
 export = createRevive
-declare function createRevive(moduleArg?: {})
+declare function createRevive(moduleArg?)
