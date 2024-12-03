@@ -104,13 +104,18 @@ export async function compile(sources: SolcInput): Promise<SolcOutput> {
         }),
     }
 
-    const response = await fetch('https://remix-backend.polkadot.io/resolc', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-    })
+    const BACKENDROOT_URL =
+        process.env.REMIX_BACKEND ?? 'https://remix-backend.polkadot.io'
+    const response = await fetch(
+        process.env.REMIX_BACKEND ?? `${BACKENDROOT_URL}/resolc`,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body),
+        }
+    )
 
     if (!response.ok) {
         const text = await response.text().catch(() => '')
