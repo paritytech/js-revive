@@ -104,7 +104,9 @@ export async function compile(sources: SolcInput): Promise<SolcOutput> {
         }),
     }
 
-    const response = await fetch('https://remix-backend.polkadot.io/resolc', {
+    const BACKENDROOT_URL =
+        process.env.REMIX_BACKEND ?? 'https://remix-backend.polkadot.io'
+    const response = await fetch(`${BACKENDROOT_URL}/resolc`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
