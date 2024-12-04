@@ -94,7 +94,7 @@ export async function compile(sources: SolcInput): Promise<SolcOutput> {
             language: 'Solidity',
             sources,
             settings: {
-                optimizer: { enabled: false, runs: 200 },
+                optimizer: { enabled: true, runs: 200 },
                 outputSelection: {
                     '*': {
                         '*': ['abi'],
