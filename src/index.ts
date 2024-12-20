@@ -1,4 +1,5 @@
 import solc from 'solc'
+import { resolc } from './resolc'
 import path from 'path'
 import { existsSync, readFileSync } from 'fs'
 
@@ -22,7 +23,7 @@ type SolcError = {
     type: string
 }
 
-type SolcOutput = {
+export type SolcOutput = {
     contracts: {
         [contractPath: string]: {
             [contractName: string]: {
@@ -84,7 +85,46 @@ export function resolveInputs(sources: SolcInput): SolcInput {
     )
 }
 
-export async function compile(sources: SolcInput): Promise<SolcOutput> {
+export async function compile(
+    sources: SolcInput,
+    option: { wasm: boolean; baseUrl?: string } = {
+        wasm: false,
+    }
+): Promise<SolcOutput> {
+    if (option.wasm) {
+        return compileWithWasm(sources)
+    }
+
+    return compileWithBackend(
+        sources,
+        option.baseUrl ?? 'https://remix-backend.polkadot.io'
+    )
+}
+
+function compileWithWasm(sources: SolcInput): SolcOutput {
+    // compile with solc to resolve all the imports
+    sources = resolveInputs(sources)
+
+    const input = JSON.stringify({
+        language: 'Solidity',
+        sources,
+        settings: {
+            optimizer: { enabled: true, runs: 200 },
+            outputSelection: {
+                '*': {
+                    '*': ['abi'],
+                },
+            },
+        },
+    })
+
+    return resolc(input)
+}
+
+async function compileWithBackend(
+    sources: SolcInput,
+    baseUrl: string
+): Promise<SolcOutput> {
     // compile with solc to resolve all the imports
     sources = resolveInputs(sources)
 
@@ -104,9 +144,7 @@ export async function compile(sources: SolcInput): Promise<SolcOutput> {
         }),
     }
 
-    const BACKENDROOT_URL =
-        process.env.REMIX_BACKEND ?? 'https://remix-backend.polkadot.io'
-    const response = await fetch(`${BACKENDROOT_URL}/resolc`, {
+    const response = await fetch(`${baseUrl}/resolc`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
