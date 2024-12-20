@@ -3,7 +3,7 @@ import Resolc from './resolc/resolc'
 import type { SolcOutput } from '.'
 
 export function resolc(input: string): SolcOutput {
-    const m = Resolc() as any
+    const m = Resolc() as any // eslint-disable-line @typescript-eslint/no-explicit-any
     m.soljson = soljson
     m.writeToStdin(input)
     m.callMain(['--standard-json'])
