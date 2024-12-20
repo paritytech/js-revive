@@ -91,23 +91,9 @@ export async function compile(
         wasm: false,
     }
 ): Promise<SolcOutput> {
-    if (option.wasm) {
-        return compileWithWasm(sources)
-    }
-
-    return compileWithBackend(
-        sources,
-        option.baseUrl ?? 'https://remix-backend.polkadot.io'
-    )
-}
-
-function compileWithWasm(sources: SolcInput): SolcOutput {
-    // compile with solc to resolve all the imports
-    sources = resolveInputs(sources)
-
     const input = JSON.stringify({
         language: 'Solidity',
-        sources,
+        sources: resolveInputs(sources),
         settings: {
             optimizer: { enabled: true, runs: 200 },
             outputSelection: {
@@ -118,30 +104,23 @@ function compileWithWasm(sources: SolcInput): SolcOutput {
         },
     })
 
-    return resolc(input)
+    if (option.wasm) {
+        return resolc(input)
+    }
+
+    return compileWithBackend(
+        input,
+        option.baseUrl ?? 'https://remix-backend.polkadot.io'
+    )
 }
 
 async function compileWithBackend(
-    sources: SolcInput,
+    input: string,
     baseUrl: string
 ): Promise<SolcOutput> {
-    // compile with solc to resolve all the imports
-    sources = resolveInputs(sources)
-
     const body = {
         cmd: '--standard-json',
-        input: JSON.stringify({
-            language: 'Solidity',
-            sources,
-            settings: {
-                optimizer: { enabled: true, runs: 200 },
-                outputSelection: {
-                    '*': {
-                        '*': ['abi'],
-                    },
-                },
-            },
-        }),
+        input,
     }
 
     const response = await fetch(`${baseUrl}/resolc`, {
