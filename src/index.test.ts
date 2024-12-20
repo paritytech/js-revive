@@ -12,9 +12,13 @@ test('check Ok output', async () => {
         },
     }
 
-    const out = await compile(sources)
-    assert(out.contracts[contract].Storage.abi != null)
-    assert(out.contracts[contract].Storage.evm.bytecode != null)
+    const compileOptions = [{ wasm: false }, { wasm: true }]
+
+    for (const options of compileOptions) {
+        const out = await compile(sources, options)
+        assert(out.contracts[contract].Storage.abi != null)
+        assert(out.contracts[contract].Storage.evm.bytecode != null)
+    }
 })
 
 test('check Err output', async () => {

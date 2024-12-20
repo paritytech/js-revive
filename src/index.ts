@@ -1,4 +1,5 @@
 import solc from 'solc'
+import { resolc } from './resolc'
 import path from 'path'
 import { existsSync, readFileSync } from 'fs'
 
@@ -22,7 +23,7 @@ type SolcError = {
     type: string
 }
 
-type SolcOutput = {
+export type SolcOutput = {
     contracts: {
         [contractPath: string]: {
             [contractName: string]: {
@@ -84,29 +85,45 @@ export function resolveInputs(sources: SolcInput): SolcInput {
     )
 }
 
-export async function compile(sources: SolcInput): Promise<SolcOutput> {
-    // compile with solc to resolve all the imports
-    sources = resolveInputs(sources)
-
-    const body = {
-        cmd: '--standard-json',
-        input: JSON.stringify({
-            language: 'Solidity',
-            sources,
-            settings: {
-                optimizer: { enabled: true, runs: 200 },
-                outputSelection: {
-                    '*': {
-                        '*': ['abi'],
-                    },
+export async function compile(
+    sources: SolcInput,
+    option: { wasm: boolean; baseUrl?: string } = {
+        wasm: false,
+    }
+): Promise<SolcOutput> {
+    const input = JSON.stringify({
+        language: 'Solidity',
+        sources: resolveInputs(sources),
+        settings: {
+            optimizer: { enabled: true, runs: 200 },
+            outputSelection: {
+                '*': {
+                    '*': ['abi'],
                 },
             },
-        }),
+        },
+    })
+
+    if (option.wasm) {
+        return resolc(input)
     }
 
-    const BACKENDROOT_URL =
-        process.env.REMIX_BACKEND ?? 'https://remix-backend.polkadot.io'
-    const response = await fetch(`${BACKENDROOT_URL}/resolc`, {
+    return compileWithBackend(
+        input,
+        option.baseUrl ?? 'https://remix-backend.polkadot.io'
+    )
+}
+
+async function compileWithBackend(
+    input: string,
+    baseUrl: string
+): Promise<SolcOutput> {
+    const body = {
+        cmd: '--standard-json',
+        input,
+    }
+
+    const response = await fetch(`${baseUrl}/resolc`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

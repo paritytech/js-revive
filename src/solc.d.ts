@@ -1,3 +1,5 @@
+declare module 'solc/soljson' {}
+
 declare module 'solc' {
     // Basic types for input/output handling
     export interface CompileInput {
