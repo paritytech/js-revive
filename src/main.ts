@@ -9,7 +9,7 @@ const sources = {
 }
 
 async function main() {
-    const outputs = await compile(sources)
+    const outputs = await compile(sources, { wasm: true })
     console.log(outputs)
 }
 
