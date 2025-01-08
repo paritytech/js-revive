@@ -1,4 +1,5 @@
 import solc from 'solc'
+import { spawn } from 'child_process'
 import { resolc } from './resolc'
 import path from 'path'
 import { existsSync, readFileSync } from 'fs'
@@ -87,7 +88,7 @@ export function resolveInputs(sources: SolcInput): SolcInput {
 
 export async function compile(
     sources: SolcInput,
-    option: { wasm: boolean; baseUrl?: string } = {
+    option: { wasm?: boolean; bin?: string; baseUrl?: string } = {
         wasm: false,
     }
 ): Promise<SolcOutput> {
@@ -106,6 +107,10 @@ export async function compile(
 
     if (option.wasm) {
         return resolc(input)
+    }
+
+    if (option.bin) {
+        return compileWithBin(input, option.bin)
     }
 
     return compileWithBackend(
@@ -191,4 +196,36 @@ export function tryResolveImport(importPath: string) {
     } else {
         throw new Error(`Resolved path ${resolvedPath} does not exist.`)
     }
+}
+function compileWithBin(input: string, bin: string): PromiseLike<SolcOutput> {
+    return new Promise((resolve, reject) => {
+        const process = spawn(bin, ['--standard-json'])
+
+        let output = ''
+        let error = ''
+
+        process.stdin.write(input)
+        process.stdin.end()
+
+        process.stdout.on('data', (data) => {
+            output += data.toString()
+        })
+
+        process.stderr.on('data', (data) => {
+            error += data.toString()
+        })
+
+        process.on('close', (code) => {
+            if (code === 0) {
+                try {
+                    const result: SolcOutput = JSON.parse(output)
+                    resolve(result)
+                } catch (e) {
+                    reject(new Error('Failed to parse output'))
+                }
+            } else {
+                reject(new Error(`Process exited with code ${code}: ${error}`))
+            }
+        })
+    })
 }

@@ -5,14 +5,14 @@ import { compile, tryResolveImport } from '.'
 import { resolve } from 'node:path'
 
 test('check Ok output', async () => {
-    const contract = 'contracts/1_Storage.sol'
+    const contract = 'fixtures/token.sol'
     const sources = {
         [contract]: {
             content: readFileSync('fixtures/storage.sol', 'utf8'),
         },
     }
 
-    const compileOptions = [{ wasm: false }, { wasm: true }]
+    const compileOptions = [{ wasm: false }, { wasm: true }, { bin: 'resolc' }]
 
     for (const options of compileOptions) {
         const out = await compile(sources, options)
