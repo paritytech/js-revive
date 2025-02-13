@@ -12,7 +12,7 @@ test('check Ok output', async () => {
         },
     }
 
-    const compileOptions = [{ wasm: false }, { wasm: true }, { bin: 'resolc' }]
+    const compileOptions = [{}, { bin: 'resolc' }]
 
     for (const options of compileOptions) {
         const out = await compile(sources, options)
