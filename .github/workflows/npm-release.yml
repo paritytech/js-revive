@@ -37,7 +37,7 @@ jobs:
                   name: package
                   path: 'parity-revive-*.tgz'
 
-            - uses: octokit/request-action@v2.3.0
+            - uses: octokit/request-action@bbedc70b1981e610d89f1f8de88311a1fc02fb83
               with:
                   route: POST /repos/paritytech/npm_publish_automation/actions/workflows/publish.yml/dispatches
                   ref: main
