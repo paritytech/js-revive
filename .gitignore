@@ -1,4 +1,6 @@
 # Based on https://raw.githubusercontent.com/github/gitignore/main/Node.gitignore
+src/resolc/resolc.js
+src/resolc/resolc.wasm
 
 # Logs
 

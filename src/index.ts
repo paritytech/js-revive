@@ -88,9 +88,7 @@ export function resolveInputs(sources: SolcInput): SolcInput {
 
 export async function compile(
     sources: SolcInput,
-    option: { wasm?: boolean; bin?: string; baseUrl?: string } = {
-        wasm: false,
-    }
+    option: { bin?: string } = {}
 ): Promise<SolcOutput> {
     const input = JSON.stringify({
         language: 'Solidity',
@@ -105,43 +103,11 @@ export async function compile(
         },
     })
 
-    if (option.wasm) {
-        return resolc(input)
-    }
-
     if (option.bin) {
         return compileWithBin(input, option.bin)
     }
 
-    return compileWithBackend(
-        input,
-        option.baseUrl ?? 'https://remix-backend.polkadot.io'
-    )
-}
-
-async function compileWithBackend(
-    input: string,
-    baseUrl: string
-): Promise<SolcOutput> {
-    const body = {
-        cmd: '--standard-json',
-        input,
-    }
-
-    const response = await fetch(`${baseUrl}/resolc`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-    })
-
-    if (!response.ok) {
-        const text = await response.text().catch(() => '')
-        throw new Error(`${response.statusText}: ${text}`)
-    }
-
-    return (await response.json()) as SolcOutput
+    return resolc(input)
 }
 
 /**
@@ -220,8 +186,8 @@ function compileWithBin(input: string, bin: string): PromiseLike<SolcOutput> {
                 try {
                     const result: SolcOutput = JSON.parse(output)
                     resolve(result)
-                } catch (e) {
-                    reject(new Error('Failed to parse output'))
+                } catch {
+                    reject(new Error(`Failed to parse output`))
                 }
             } else {
                 reject(new Error(`Process exited with code ${code}: ${error}`))

@@ -3,23 +3,36 @@ import { readFileSync } from 'node:fs'
 import assert from 'node:assert'
 import { compile, tryResolveImport } from '.'
 import { resolve } from 'node:path'
+import { execSync } from 'node:child_process'
 
-test('check Ok output', async () => {
-    const contract = 'fixtures/token.sol'
-    const sources = {
-        [contract]: {
-            content: readFileSync('fixtures/storage.sol', 'utf8'),
-        },
+function isResolcInPath() {
+    try {
+        execSync('resolc --version', { stdio: 'ignore' })
+        return true
+    } catch {
+        return false
     }
+}
 
-    const compileOptions = [{ wasm: false }, { wasm: true }, { bin: 'resolc' }]
+const compileOptions = [{}]
+if (isResolcInPath()) {
+    compileOptions.push({ bin: 'resolc' })
+}
 
-    for (const options of compileOptions) {
+for (const options of compileOptions) {
+    test(`check Ok output with option ${JSON.stringify(options)}`, async () => {
+        const contract = 'fixtures/token.sol'
+        const sources = {
+            [contract]: {
+                content: readFileSync('fixtures/storage.sol', 'utf8'),
+            },
+        }
+
         const out = await compile(sources, options)
         assert(out.contracts[contract].Storage.abi != null)
         assert(out.contracts[contract].Storage.evm.bytecode != null)
-    }
-})
+    })
+}
 
 test('check Err output', async () => {
     const contract = 'contracts/1_Storage.sol'
