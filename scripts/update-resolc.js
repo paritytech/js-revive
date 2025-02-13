@@ -6,12 +6,12 @@ async function main() {
     let asset_url = ''
     try {
         const response = await fetch(
-            'https://api.github.com/repos/paritytech/revive/releases',
+            'https://api.github.com/repos/paritytech/revive/releases/latest',
             { headers }
         )
 
         const json = await response.json()
-        asset_url = json[0].assets_url
+        asset_url = json.assets_url
     } catch (error) {
         console.error(`Failed to get asset_url: ${error}`)
         process.exit(1)
