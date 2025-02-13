@@ -186,8 +186,8 @@ function compileWithBin(input: string, bin: string): PromiseLike<SolcOutput> {
                 try {
                     const result: SolcOutput = JSON.parse(output)
                     resolve(result)
-                } catch (e) {
-                    reject(new Error('Failed to parse output'))
+                } catch {
+                    reject(new Error(`Failed to parse output`))
                 }
             } else {
                 reject(new Error(`Process exited with code ${code}: ${error}`))
