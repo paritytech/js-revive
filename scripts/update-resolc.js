@@ -1,3 +1,5 @@
+const fs = require('fs')
+
 async function main() {
     const headers = { 'content-type': 'application/json' }
 
@@ -34,9 +36,8 @@ async function main() {
             })
             const data = await response.arrayBuffer()
 
-            const fs = require('fs')
             fs.writeFileSync(`src/resolc/${assetName}`, Buffer.from(data))
-            console.log(`${assetName} updated`)
+            console.log(`src/resolc/${assetName} updated`)
         }
     } catch (error) {
         console.error(`Failed to download wasm: ${error}`)
