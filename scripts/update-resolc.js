@@ -11,6 +11,8 @@ async function main() {
         )
 
         const json = await response.json()
+        console.log(`Using release ${json.name}`)
+
         asset_url = json.assets_url
     } catch (error) {
         console.error(`Failed to get asset_url: ${error}`)
