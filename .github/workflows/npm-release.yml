@@ -23,7 +23,7 @@ jobs:
             - name: Install
               run: yarn install --immutable
 
-            - name: Build
+            - name: update-resolc
               run: yarn update-resolc
 
             - name: Build
