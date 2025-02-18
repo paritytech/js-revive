@@ -24,6 +24,9 @@ jobs:
               run: yarn install --immutable
 
             - name: Build
+              run: yarn update-resolc
+
+            - name: Build
               run: yarn build
 
             - name: Set version

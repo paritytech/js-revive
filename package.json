@@ -17,7 +17,7 @@
         "dist"
     ],
     "scripts": {
-        "postinstall": "node ./scripts/update-resolc.js",
+        "update-resolc": "node ./scripts/update-resolc.js",
         "build": "tsc && cp src/resolc/** dist/resolc",
         "lint": "npx eslint 'src/**/*.{cjs,ts}' && npx prettier --check '**/*.{ts,json,yml,md}'",
         "lint:fix": "npx prettier --write '**/*.{ts,json,yml,md}'",
