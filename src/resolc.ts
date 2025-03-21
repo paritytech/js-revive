@@ -7,5 +7,11 @@ export function resolc(input: string): SolcOutput {
     m.soljson = soljson
     m.writeToStdin(input)
     m.callMain(['--standard-json'])
+    const err = m.readFromStderr()
+
+    if (err) {
+        throw new Error(err)
+    }
+
     return JSON.parse(m.readFromStdout()) as SolcOutput
 }

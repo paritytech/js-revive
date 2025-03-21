@@ -35,9 +35,8 @@ for (const options of compileOptions) {
 }
 
 test('check Err output', async () => {
-    const contract = 'contracts/1_Storage.sol'
     const sources = {
-        [contract]: {
+        bad: {
             content: readFileSync('fixtures/storage_bad.sol', 'utf8'),
         },
     }
@@ -53,6 +52,25 @@ test('check Err output', async () => {
             'Source file does not specify required compiler version'
         )
     )
+})
+
+test('check Err from stderr', async () => {
+    const sources = {
+        bad: {
+            content: readFileSync('fixtures/bad_pragma.sol', 'utf8'),
+        },
+    }
+
+    try {
+        await compile(sources)
+        assert(false, 'Expected error')
+    } catch (error) {
+        assert(
+            String(error).includes(
+                'Source file requires different compiler version'
+            )
+        )
+    }
 })
 
 test('resolve import', () => {
