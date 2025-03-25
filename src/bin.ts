@@ -151,7 +151,7 @@ async function main() {
 
     fs.mkdirSync(destination, { recursive: true })
 
-    function writeFile(file: string, content: string) {
+    function writeFile(file: string, content: Buffer | string) {
         file = path.join(destination, file)
         fs.writeFile(file, content, function (err) {
             if (err) {
@@ -168,7 +168,11 @@ async function main() {
             if (options.bin) {
                 writeFile(
                     contractFileName + '.polkavm',
-                    output.contracts[fileName][contractName].evm.bytecode.object
+                    Buffer.from(
+                        output.contracts[fileName][contractName].evm.bytecode
+                            .object,
+                        'hex'
+                    )
                 )
             }
 
