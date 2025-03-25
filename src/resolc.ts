@@ -15,3 +15,16 @@ export function resolc(input: string): SolcOutput {
 
     return JSON.parse(m.readFromStdout()) as SolcOutput
 }
+
+export function version(): string {
+    const m = Resolc() as any // eslint-disable-line @typescript-eslint/no-explicit-any
+    m.soljson = soljson
+    m.callMain(['--version'])
+    const err = m.readFromStderr()
+
+    if (err) {
+        throw new Error(err)
+    }
+
+    return m.readFromStdout()
+}
