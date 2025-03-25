@@ -6,6 +6,9 @@
     "module": "index.ts",
     "types": "./dist/index.d.ts",
     "main": "./dist/index.js",
+    "bin": {
+        "resolc": "./dist/bin.js"
+    },
     "exports": {
         ".": {
             "import": "./dist/index.js",
@@ -34,6 +37,7 @@
     },
     "dependencies": {
         "@types/node": "^22.9.0",
+        "commander": "^13.1.0",
         "package-json": "^10.0.1",
         "solc": "^0.8.29"
     },

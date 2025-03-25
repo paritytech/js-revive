@@ -1,16 +1,16 @@
 import solc from 'solc'
 import { spawn } from 'child_process'
-import { resolc } from './resolc'
+import { resolc, version as resolcVersion } from './resolc'
 import path from 'path'
 import { existsSync, readFileSync } from 'fs'
 
-type SolcInput = {
+export type SolcInput = {
     [contractName: string]: {
         content: string
     }
 }
 
-type SolcError = {
+export type SolcError = {
     component: string
     errorCode: string
     formattedMessage: string
@@ -84,6 +84,11 @@ export function resolveInputs(sources: SolcInput): SolcInput {
             ]
         })
     )
+}
+
+export function version(): string {
+    const v = resolcVersion()
+    return v.split(' ').pop() ?? v
 }
 
 export async function compile(
