@@ -7,7 +7,7 @@
     "types": "./dist/index.d.ts",
     "main": "./dist/index.js",
     "bin": {
-        "resolc": "./dist/bin.js"
+        "revive": "./dist/bin.js"
     },
     "exports": {
         ".": {
