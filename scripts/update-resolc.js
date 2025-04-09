@@ -4,7 +4,7 @@ const { pipeline } = require('stream')
 const { promisify } = require('util')
 
 const streamPipeline = promisify(pipeline)
-const ASSET_NAMES = ['resolc.wasm', 'resolc_web.js']
+const ASSET_NAMES = ['resolc.wasm', 'resolc.js']
 
 async function main() {
     const headers = { 'content-type': 'application/json' }
