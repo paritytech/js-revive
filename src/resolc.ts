@@ -1,5 +1,5 @@
 import soljson from 'solc/soljson'
-import Resolc from './resolc/resolc'
+import Resolc from './resolc/resolc_web'
 import type { SolcOutput } from '.'
 
 export function resolc(input: string): SolcOutput {

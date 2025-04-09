@@ -1,9 +1,10 @@
 const fs = require('fs')
-const tar = require('tar')
+const path = require('path')
 const { pipeline } = require('stream')
 const { promisify } = require('util')
 
-const streamPipeline = promisify(pipeline) // Convert pipeline to a Promise-based function
+const streamPipeline = promisify(pipeline)
+const ASSET_NAMES = ['resolc.wasm', 'resolc_web.js']
 
 async function main() {
     const headers = { 'content-type': 'application/json' }
@@ -27,40 +28,40 @@ async function main() {
         process.exit(1)
     }
 
-    try {
-        const asset = assets.find(
-            (asset) => asset.name === 'resolc-wasm32-unknown-emscripten.tar.gz'
+    const filteredAssets = assets.filter((asset) =>
+        ASSET_NAMES.includes(asset.name)
+    )
+
+    if (filteredAssets.length === 0) {
+        console.error(
+            `None of the specified assets (${ASSET_NAMES.join(', ')}) found in release. Available assets: ${assets.map((a) => a.name).join(', ')}`
         )
-
-        if (!asset) {
-            throw new Error('Asset not found in release')
-        }
-
-        const response = await fetch(asset.browser_download_url, {
-            headers: { 'content-type': 'application/octet-stream' },
-        })
-
-        if (!response.ok) {
-            throw new Error(`Failed to fetch asset: ${response.statusText}`)
-        }
-
-        // Ensure the directory exists
-        fs.mkdirSync('src/resolc', { recursive: true })
-
-        const extract = tar.x({
-            cwd: 'src/resolc',
-            filter: (filepath) => {
-                return ['resolc.wasm', 'resolc.js'].includes(filepath)
-            },
-        })
-
-        // Use pipeline instead of pipeTo (which is for Web Streams)
-        await streamPipeline(response.body, extract)
-
-        console.log(`Successfully extracted resolc.wasm and resolc.js`)
-    } catch (error) {
-        console.error(`Failed to download and extract wasm: ${error}`)
         process.exit(1)
+    }
+
+    const outDir = path.resolve('src/resolc')
+    fs.mkdirSync(outDir, { recursive: true })
+
+    for (const asset of filteredAssets) {
+        console.log(`Downloading ${asset.browser_download_url}...`)
+
+        try {
+            const response = await fetch(asset.browser_download_url, {
+                headers: { 'content-type': 'application/octet-stream' },
+            })
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch asset: ${response.statusText}`)
+            }
+
+            const filePath = path.join(outDir, asset.name)
+            await streamPipeline(response.body, fs.createWriteStream(filePath))
+
+            console.log(`Successfully downloaded ${asset.name} to ${filePath}`)
+        } catch (error) {
+            console.error(`Failed to download asset ${asset.name}: ${error}`)
+            process.exit(1)
+        }
     }
 }
 
