@@ -1,3 +1,5 @@
+> The code moved to https://github.com/paritytech/revive. The package is now published under the name `@parity/resolc` on npm.
+
 # @parity/revive
 
 Node.js module to compile Solidity contracts to Polkavm bytecode, using [Revive](https://github.com/paritytech/revive)
